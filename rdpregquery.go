@@ -7,6 +7,7 @@ import (
 	"golang.org/x/sys/windows/registry"
 )
 
+// leveraging win32 api to enumerate list of successful RDP sessions from HKCurrentUser
 func RDPHostQuery() ([]string, error) {
 	var e error
 	var k registry.Key
