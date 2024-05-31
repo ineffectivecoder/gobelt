@@ -4,7 +4,6 @@ import (
 	"flag"
 	"fmt"
 	"gobelt"
-	"os"
 )
 
 func main() {
@@ -25,10 +24,7 @@ func main() {
 		}
 	}
 	if *version {
-		fmt.Printf("[+] Gobelt version .5\n")
+		fmt.Printf("[+] Gobelt version 1.0\n")
 	}
 
-	if len(os.Args) < 2 {
-		fmt.Print("[-] No parameters selected, exiting...")
-	}
 }
