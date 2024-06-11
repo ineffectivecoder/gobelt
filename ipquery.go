@@ -1,14 +1,25 @@
 package gobelt
 
 import (
-	"fmt"
 	"net"
+	"strings"
 )
 
-func IPQuery() {
+func IPQuery() []string {
 	addrs, _ := net.InterfaceAddrs()
-	fmt.Printf("%v\n", addrs)
+	var value []string
+	var ip net.IP
 	for _, addr := range addrs {
-		fmt.Println("IPv4: ", addr)
+		tmp := addr.String()
+		tmp = tmp[0:strings.Index(tmp, "/")]
+
+		if ip = net.ParseIP(tmp); (ip == nil) || ip.IsLoopback() {
+			continue
+		}
+		if ip.IsLinkLocalMulticast() || ip.IsLinkLocalUnicast() {
+			continue
+		}
+		value = append(value, tmp)
 	}
+	return value
 }

@@ -12,6 +12,7 @@ func main() {
 	fmt.Print("[+] Welcome to Gobelt, the Golang alternative to Seatbelt\n")
 	// fun with flags
 	rdphostquery := flag.Bool("rdphostquery", false, "Queries registry for successful RDP sessions performed by Current User")
+	ipquery := flag.Bool("ipquery", false, "Queries ip addressing information of network interfaces")
 	version := flag.Bool("version", false, "Prints version information")
 	flag.Parse()
 
@@ -21,6 +22,13 @@ func main() {
 			fmt.Printf("Received an error %s", e.Error())
 		} else {
 			fmt.Printf("[+] The value of the registry key is %s", key)
+		}
+	}
+	if *ipquery {
+		fmt.Printf("[+] Printing out list of IPs that are currently assigned to an interface\n")
+		addr := gobelt.IPQuery()
+		for i := 0; i < len(addr); i++ {
+			fmt.Println(addr[i])
 		}
 	}
 	if *version {
