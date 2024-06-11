@@ -8,7 +8,7 @@ import (
 )
 
 // leveraging win32 api to enumerate list of successful RDP sessions from HKCurrentUser
-func RDPHostQuery() ([]string, error) {
+func RDPRegQuery() ([]string, error) {
 	var e error
 	var k registry.Key
 	var value []string

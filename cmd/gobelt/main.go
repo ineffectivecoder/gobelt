@@ -11,13 +11,13 @@ func main() {
 	var e error
 	fmt.Print("[+] Welcome to Gobelt, the Golang alternative to Seatbelt\n")
 	// fun with flags
-	rdphostquery := flag.Bool("rdphostquery", false, "Queries registry for successful RDP sessions performed by Current User")
+	rdpregquery := flag.Bool("rdpregquery", false, "Queries registry for successful RDP sessions performed by Current User")
 	ipquery := flag.Bool("ipquery", false, "Queries ip addressing information of network interfaces")
 	version := flag.Bool("version", false, "Prints version information")
 	flag.Parse()
 
-	if *rdphostquery {
-		key, e = gobelt.RDPHostQuery()
+	if *rdpregquery {
+		key, e = gobelt.RDPRegQuery()
 		if e != nil {
 			fmt.Printf("Received an error %s", e.Error())
 		} else {
@@ -25,7 +25,7 @@ func main() {
 		}
 	}
 	if *ipquery {
-		fmt.Printf("[+] Printing out list of IPs that are currently assigned to an interface\n")
+		fmt.Printf("[+] Printing out list of IPv4 IPs that are currently assigned to an interface\n")
 		addr := gobelt.IPQuery()
 		for i := 0; i < len(addr); i++ {
 			fmt.Println(addr[i])
