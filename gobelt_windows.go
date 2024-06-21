@@ -86,7 +86,7 @@ func MappedDrives() Result {
 	var q string
 	var value []string
 
-	fmt.Println("[+] Retrieving list of mapped drives via WMI")
+	fmt.Println("[+] Retrieving list of mapped drives using WMI")
 
 	q = wmi.CreateQuery(&dst, "")
 	err = wmi.Query(q, &dst)
