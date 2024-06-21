@@ -15,6 +15,7 @@ func NewChecker() *Checker {
 	c.checks = []Check{
 		Example,
 		IPQuery,
+		MappedDrives,
 	}
 	return c
 }
