@@ -18,6 +18,12 @@ type AntiVirusProduct struct {
 	PathToSignedReportingExe string
 }
 
+type MSFT_DNSClientCache struct {
+	Data string
+	Entry string
+	Name string
+}
+
 // not using all of the fields at the moment, but leaving them 
 // in here in case we want to use them later
 type Win32_NetworkConnection struct {
@@ -83,6 +89,51 @@ func AntiVirus() Result {
 		Kind: KindInfo,
 		Data: value,
 	}
+}
+
+func DNSCache() Result {
+	var dst []MSFT_DNSClientCache
+	var err error
+	var q string
+	var value []string
+
+	value = append(
+		value,
+		"[+] Retrieving DNS Client Cache",
+	)
+
+	q = wmi.CreateQuery(&dst, "", "MSFT_DNSClientCache")
+	err = wmi.QueryNamespace(q, &dst, `root\standardcimv2`)
+	if err != nil {
+		return Result {
+			Kind: KindError,
+			Error: err,
+		}
+	}
+
+	if len(dst) == 0 {
+		return Result {
+			Kind: KindError,
+			Error: errors.New("No DNS cache found"),
+		}
+	}
+
+	value = append(value, "[+] DNS Cache:\n")
+	for _, cacheentry := range(dst) {
+		value = append(
+			value,
+			"Name:   " + cacheentry.Name,
+			"Entry:  " + cacheentry.Entry,
+			"Data:   " + cacheentry.Data,
+			"\n",
+		)
+	}
+
+	return Result{
+		Kind: KindInfo,
+		Data: value,
+	}
+
 }
 
 // retrieves list of mapped drives using WMI to query 

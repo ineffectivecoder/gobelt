@@ -13,6 +13,7 @@ type Checker struct {
 func NewChecker() *Checker {
 	c := &Checker{}
 	c.checks = []Check{
+		DNSCache,
 		IPQuery,
 		MappedDrives,
 		AntiVirus,
