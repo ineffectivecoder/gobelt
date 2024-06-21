@@ -9,6 +9,8 @@ import (
 	"golang.org/x/sys/windows/registry"
 )
 
+// not using all of the fields at the moment, but leaving them 
+// in here in case we want to use them later
 type Win32_NetworkConnection struct {
 	Caption string
 	Description string
@@ -80,6 +82,8 @@ func RDPRegQuery() Result {
 	}
 }
 
+// retrieves list of mapped drives using WMI to query 
+// Win32_NetworkConnection
 func MappedDrives() Result {
 	var dst []Win32_NetworkConnection
 	var err error
