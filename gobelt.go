@@ -13,9 +13,9 @@ type Checker struct {
 func NewChecker() *Checker {
 	c := &Checker{}
 	c.checks = []Check{
-		Example,
 		IPQuery,
 		MappedDrives,
+		AntiVirus,
 	}
 	return c
 }
