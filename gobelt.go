@@ -6,27 +6,15 @@ import (
 	"strings"
 )
 
+type Check func() Result
 type Checker struct {
 	checks []Check
 }
-
-func NewChecker() *Checker {
-	c := &Checker{}
-	c.checks = []Check{
-		DNSCache,
-		IPQuery,
-		MappedDrives,
-		AntiVirus,
-	}
-	return c
+type Result struct {
+	Kind  ResultKind
+	Data  []string
+	Error error
 }
-
-func (c Checker) Checks() []Check {
-	return c.checks
-}
-
-type Check func() Result
-
 type ResultKind int
 
 const (
@@ -34,10 +22,15 @@ const (
 	KindInfo
 )
 
-type Result struct {
-	Kind  ResultKind
-	Data  []string
-	Error error
+func NewChecker() *Checker {
+	c := &Checker{}
+	c.checks = []Check{IPQuery}
+	c.checks = append(c.checks, osSpecific()...)
+	return c
+}
+
+func (c Checker) Checks() []Check {
+	return c.checks
 }
 
 func (r Result) String() string {

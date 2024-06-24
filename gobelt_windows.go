@@ -9,41 +9,41 @@ import (
 	"golang.org/x/sys/windows/registry"
 )
 
-// not including all of the fields for AntivirusProduct, just 
+// not including all of the fields for AntivirusProduct, just
 // what we need
 type AntiVirusProduct struct {
-	DisplayName string
-	InstanceGuid string
-	PathToSignedProductExe string
+	DisplayName              string
+	InstanceGuid             string
+	PathToSignedProductExe   string
 	PathToSignedReportingExe string
 }
 
 type MSFT_DNSClientCache struct {
-	Data string
+	Data  string
 	Entry string
-	Name string
+	Name  string
 }
 
-// not using all of the fields at the moment, but leaving them 
+// not using all of the fields at the moment, but leaving them
 // in here in case we want to use them later
 type Win32_NetworkConnection struct {
-	Caption string
-	Description string
-	InstallDate string
-	Status string
-	AccessMask uint32
-	Comment string
+	Caption         string
+	Description     string
+	InstallDate     string
+	Status          string
+	AccessMask      uint32
+	Comment         string
 	ConnectionState string
-	ConnectionType string
-	DisplayType string
-	LocalName string
-	Name string
-	Persistent bool
-	ProviderName string
-	RemoteName string
-	RemotePath string
-	ResourceType string
-	UserName string
+	ConnectionType  string
+	DisplayType     string
+	LocalName       string
+	Name            string
+	Persistent      bool
+	ProviderName    string
+	RemoteName      string
+	RemotePath      string
+	ResourceType    string
+	UserName        string
 }
 
 func AntiVirus() Result {
@@ -60,27 +60,27 @@ func AntiVirus() Result {
 	q = wmi.CreateQuery(&dst, "", "AntiVirusProduct")
 	err = wmi.QueryNamespace(q, &dst, `root\SecurityCenter2`)
 	if err != nil {
-		return Result {
-			Kind: KindError,
+		return Result{
+			Kind:  KindError,
 			Error: err,
 		}
 	}
 
 	if len(dst) == 0 {
-		return Result {
-			Kind: KindError,
+		return Result{
+			Kind:  KindError,
 			Error: errors.New("No antivirus found"),
 		}
 	}
 
 	value = append(value, "[+] Installed Antivirus Products:\n")
-	for _, av := range(dst) {
+	for _, av := range dst {
 		value = append(
 			value,
-			"Name:                  " + av.DisplayName,
-			"Instance GUID:         " + av.InstanceGuid,
-			"Path to Product EXE:   " + av.PathToSignedProductExe,
-			"Path to Reporting EXE: " + av.PathToSignedReportingExe,
+			"Name:                  "+av.DisplayName,
+			"Instance GUID:         "+av.InstanceGuid,
+			"Path to Product EXE:   "+av.PathToSignedProductExe,
+			"Path to Reporting EXE: "+av.PathToSignedReportingExe,
 			"\n",
 		)
 	}
@@ -105,26 +105,26 @@ func DNSCache() Result {
 	q = wmi.CreateQuery(&dst, "", "MSFT_DNSClientCache")
 	err = wmi.QueryNamespace(q, &dst, `root\standardcimv2`)
 	if err != nil {
-		return Result {
-			Kind: KindError,
+		return Result{
+			Kind:  KindError,
 			Error: err,
 		}
 	}
 
 	if len(dst) == 0 {
-		return Result {
-			Kind: KindError,
+		return Result{
+			Kind:  KindError,
 			Error: errors.New("No DNS cache found"),
 		}
 	}
 
 	value = append(value, "[+] DNS Cache:\n")
-	for _, cacheentry := range(dst) {
+	for _, cacheentry := range dst {
 		value = append(
 			value,
-			"Name:   " + cacheentry.Name,
-			"Entry:  " + cacheentry.Entry,
-			"Data:   " + cacheentry.Data,
+			"Name:   "+cacheentry.Name,
+			"Entry:  "+cacheentry.Entry,
+			"Data:   "+cacheentry.Data,
 			"\n",
 		)
 	}
@@ -136,7 +136,7 @@ func DNSCache() Result {
 
 }
 
-// retrieves list of mapped drives using WMI to query 
+// retrieves list of mapped drives using WMI to query
 // Win32_NetworkConnection
 func MappedDrives() Result {
 	var dst []Win32_NetworkConnection
@@ -145,39 +145,39 @@ func MappedDrives() Result {
 	var value []string
 
 	value = append(
-		value, 
+		value,
 		"[+] Retrieving list of mapped drives using WMI",
 	)
 
 	q = wmi.CreateQuery(&dst, "")
 	err = wmi.Query(q, &dst)
 	if err != nil {
-		return Result {
-			Kind: KindError,
+		return Result{
+			Kind:  KindError,
 			Error: err,
 		}
 	}
 
 	if len(dst) == 0 {
-		return Result {
-			Kind: KindError,
+		return Result{
+			Kind:  KindError,
 			Error: errors.New("No mapped drives found"),
 		}
 	}
 
 	value = append(value, "[+] Mapped Drives:\n")
-	for _, mappeddrive := range(dst) {
+	for _, mappeddrive := range dst {
 		value = append(
 			value,
-			"Local Name:          " + mappeddrive.LocalName,
-			"Remote Name:         " + mappeddrive.RemoteName,
-			"Remote Path:         " + mappeddrive.RemotePath,
-			"Status:              " + mappeddrive.Status,
-			"ConnectionState:     " + mappeddrive.ConnectionState,
-			"Persistent:          " + 
-				fmt.Sprintf("%v",mappeddrive.Persistent),
-			"UserName:            " + mappeddrive.UserName,
-			"Description:         " + mappeddrive.Description,
+			"Local Name:          "+mappeddrive.LocalName,
+			"Remote Name:         "+mappeddrive.RemoteName,
+			"Remote Path:         "+mappeddrive.RemotePath,
+			"Status:              "+mappeddrive.Status,
+			"ConnectionState:     "+mappeddrive.ConnectionState,
+			"Persistent:          "+
+				fmt.Sprintf("%v", mappeddrive.Persistent),
+			"UserName:            "+mappeddrive.UserName,
+			"Description:         "+mappeddrive.Description,
 			"\n",
 		)
 	}
@@ -186,6 +186,10 @@ func MappedDrives() Result {
 		Kind: KindInfo,
 		Data: value,
 	}
+}
+
+func osSpecific() []Check {
+	return []Check{AntiVirus, DNSCache, MappedDrives}
 }
 
 // leveraging win32 api to enumerate list of successful RDP sessions from HKCurrentUser
@@ -238,4 +242,3 @@ func RDPRegQuery() Result {
 		Data: value,
 	}
 }
-
